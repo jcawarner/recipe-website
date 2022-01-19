@@ -4,7 +4,35 @@ import json
 
 
 def index(request):
-	return render(request, 'index.html', {})
+
+	headers = {
+		'x-rapidapi-host': "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+		'x-rapidapi-key': "ef40eaf520msh733eda9215e1f99p16edb1jsn67d51e5b20f8"
+	}
+
+	# get random recipe
+	url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random"
+
+	querystring = { "number": "6"} # number of random recipes
+
+	response = requests.request("GET", url, headers=headers, params=querystring)
+	gallery = json.loads(response.text)
+
+
+	information_response = requests.request("GET", url, headers=headers)
+	information = json.loads(information_response.content)
+
+	image_list = []
+	id_list = []
+	for recipe in gallery['recipes']:
+		images = recipe['image']
+		image_list.append(images)
+		recipe_id = recipe['id']
+		id_list.append(recipe_id)
+
+
+	return render(request, 'index.html', {'gallery': gallery['recipes'], 'images': image_list, 'recipe_id': id_list})
+
 
 def gallery(request, food):
 	url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/search"
@@ -86,11 +114,6 @@ def random_recipe(request):
 	url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random"
 
 	querystring = { "number": "1"} # number of random recipes
-
-	headers = {
-		'x-rapidapi-host': "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-		'x-rapidapi-key': "ef40eaf520msh733eda9215e1f99p16edb1jsn67d51e5b20f8"
-	}
 
 	response = requests.request("GET", url, headers=headers, params=querystring)
 	random = json.loads(response.text)
